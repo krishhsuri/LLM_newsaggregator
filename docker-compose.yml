@@ -1,0 +1,33 @@
+services:
+  # This service is for running the streamlit web app
+  web:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app  # Mount local directory to container for hot-reloading code
+      - ./data:/app/data # Mount data dir so our DB and Chroma embeddings persist
+    env_file:
+      - .env
+    command: streamlit run app.py --server.address=0.0.0.0
+
+  # You can use this service to run your ingestion scripts without starting the web server
+  ingestion:
+    build: .
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    env_file:
+      - .env
+    # Example command to run ingestion, we comment it out for now.
+    # command: python scripts/ingest_data.py
+    
+  sentiment:
+    build: .
+    volumes:
+      - .:/app
+      - ./data:/app/data
+    env_file:
+      - .env
+    # Example command to run sentiment extraction
+    # command: python scripts/run_sentiment.py
