@@ -1,0 +1,33 @@
+name: Deploy to HuggingFace Spaces
+
+# TRIGGER: This entire workflow fires automatically whenever code is pushed to the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # GitHub gives us a free Linux VM to run this job on
+
+    steps:
+      # Step 1: Download our repository code onto the GitHub Actions runner VM  
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # We need full git history for HF Spaces sync to work correctly
+
+      # Step 2: Push our code to HuggingFace Spaces using the official HF action
+      # This action connects to HF using our secret token and syncs the repository
+      - name: Push to HuggingFace Spaces
+        env:
+          # IMPORTANT: HF_TOKEN is a SECRET stored in GitHub → Settings → Secrets
+          # NEVER hardcode API keys in this file! Always use ${{ secrets.SECRET_NAME }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        uses: huggingface/huggingface_push_to_hub_action@main
+        with:
+          # Replace YOUR_USERNAME and YOUR_SPACE_NAME with your actual HuggingFace details
+          # Example: username: krishhsuri  space_name: ai-financial-terminal
+          username: krishhsuri
+          space_name: ai-financial-terminal
+          path_in_repo: .
